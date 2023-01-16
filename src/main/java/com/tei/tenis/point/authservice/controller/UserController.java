@@ -4,6 +4,7 @@ import com.tei.tenis.point.authservice.controller.exceptions.UserNotFoundExcepti
 import com.tei.tenis.point.authservice.entity.User;
 import com.tei.tenis.point.authservice.jwt.JwtGeneratorInterface;
 import com.tei.tenis.point.authservice.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/user")
-//@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:3000"}, maxAge = 3600)
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -28,13 +31,16 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> postUser(@RequestBody User user) {
+    public ResponseEntity<?> postUser(@RequestBody User user, HttpServletRequest request) {
+        log.info("AUTH POST register: " + request.getRequestURI());
         userService.saveUser(user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User user) {
+    public ResponseEntity<?> loginUser(@RequestBody User user, HttpServletRequest request) {
+        log.info("AUTH POST login: " + request.getRequestURI());
+
         if (user.getUsername() == null || user.getPassword() == null) {
             throw new UserNotFoundException("UserName or Password is Empty");
         }
